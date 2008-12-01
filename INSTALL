@@ -1,22 +1,17 @@
-Thanks for downloading Django.
+Thanks for downloading Offline-Wikipedia.
 
-To install it, make sure you have Python 2.3 or greater installed. Then run
-this command from the command prompt:
+To install it, make sure you have Python 2.4 or greater installed(needed elementtree, pyscopg2 libraries), Django 1.0 or greater installed, Postgres 8.3, Mediawiki xml dumps for what-ever language you want to use you can get them at http://download.wikimedia.org/enwiki/ . 
+To make this setup run, there are some long and lengthy steps you need to follow:
 
-    python setup.py install
+1> First run command bzip2recover over the compressed dump, it will break original file in small cunks and total size of these shunks will be of same as of   original xml.bz2 file, you can delete the One Huge Chunk.This process in itself may take around 1 hour or so and created something in order of 20000 files so please be careful of location where u do this.
 
-Note this requires a working Internet connection if you don't already have the
-Python utility "setuptools" installed.
+2>Update Index.py with correct uname, password of postgres database, location of fragmented and then run 
+	python index.py
+  it will create table names enwiki_db with four columns and around 7.2 Million rows
+  *Now here please remeber to create index of column "name" or else your query result will be very slow and hence navigation from one page to other*
 
-AS AN ALTERNATIVE, you can just copy the entire "django" directory to Python's
-site-packages directory, which is located wherever your Python installation
-lives. Some places you might check are:
+3>Copy all the fragmented xml files is data/xml_blocks/ folder.
 
-    /usr/lib/python2.4/site-packages (Unix, Python 2.4)
-    /usr/lib/python2.3/site-packages (Unix, Python 2.3)
-    C:\\PYTHON\site-packages         (Windows)
+4> *Phew...* although not at all small/short, but still your system is ready to work. Run "./manage.py runserver" in main folder, open up browser and try going on to localhost http://localhost:8000/wiki/India or something like that, and see if you can browse it through or not.
 
-This second solution does not require a working Internet connection; it
-bypasses "setuptools" entirely.
-
-For more detailed instructions, see docs/install.txt.
+There are bugs and issues, any comments, suggestions and feedbacks are welcome at shantanu[at]sarai[dot]net
