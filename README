@@ -1,0 +1,12 @@
+Offline-wikipedia is django application using which you can have all of english wikipedia on your system.
+
+U need to have all the fragmented dump files in data/xml_blocks/ folder, created enwiki_db tables in corresponding database.
+Rememer to replace parameters in page/class_con.py and views.py for database connection and other things to make it workable.
+
+Views.py uses class_con.py to convert wiki text to html, urls.py handles css files and generate wikipedia-kinda page.
+This configuration does not include Pictures and other media parts, it is text only displayed in format which is similar to en-wikipedia.
+
+In case you just want to test the converter for wiki-html only, not going through pain of downloading xml file, and configuring database, you can straight away use parser.py in main folder, remeber to provide the link to wiki-file and output will be generated as result.html, even do crosscheck the location of en_template file and change it accordingly.
+
+In case you want to contribute and have anything to say on this attempt feel free to contact me on shantanu[at]sarai[dot]net
+i am also available as baali (IRC nick) on freenode.net
