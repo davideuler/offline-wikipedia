@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 def req_handler(request, fname):		
 	#please replase xxx and others with proper parameters to make it working.
-	con = psycopg2.connect("dbname='baali' user='baali' password='pong'")
+	con = psycopg2.connect("dbname='xxx' user='xxx' password='xxx'")
 	cur = con.cursor()	
 	page = fname.split('/')
 	print page[-1]
