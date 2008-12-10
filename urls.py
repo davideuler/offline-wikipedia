@@ -14,6 +14,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     # (r'^admin/(.*)', admin.site.root),
-    (r'^wiki/(?P<fname>.*)/$','off_wiki.page.views.req_handler'),
+    (r'^wiki/(?P<fname>.*)/$','offline-wikipedia.page.views.req_handler'),
     (r'^static_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'data/media'}),	
 )
