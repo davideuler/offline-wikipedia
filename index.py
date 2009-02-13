@@ -60,6 +60,4 @@ while True:
 	cur.execute('INSERT INTO enwiki_db VALUES (%s,%s,%s,%s)',[title,fname,beg,end])
 	con.commit()						
 
-cur.execute('select * from article')
-print cur.fetchone()
 cur.close()
