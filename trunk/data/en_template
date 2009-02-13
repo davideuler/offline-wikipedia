@@ -3,23 +3,23 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<!-- headlinks removed -->
-	<link rel="shortcut icon" href="http://localhost:8000/static_media/misc/favicon.ico"/>
+	<link rel="shortcut icon" href="/wiki/misc/favicon.ico"/>
     <title>
-    <style type="text/css">/*<![CDATA[*/ @import "http://localhost:8000/static_media/skins/offline/main.css"; /*]]>*/</style>
-    <link rel="stylesheet" type="text/css" media="print" href="http://localhost:8000/static_media/skins/common/commonPrint.css" />
-    <!--[if lt IE 5.5000]><style type="text/css">@import "http://localhost:8000/static_media/skins/monobook/IE50Fixes.css";</style><![endif]-->
-    <!--[if IE 5.5000]><style type="text/css">@import "http://localhost:8000/static_media/skins/monobook/IE55Fixes.css";</style><![endif]-->
-    <!--[if IE 6]><style type="text/css">@import "http://localhost:8000/static_media/skins/monobook/IE60Fixes.css";</style><![endif]-->
-    <!--[if IE]><script type="text/javascript" src="http://localhost:8000/static_media/skins/common/IEFixes.js"></script>
+    <style type="text/css">/*<![CDATA[*/ @import "/wiki/skins/offline/main.css"; /*]]>*/</style>
+    <link rel="stylesheet" type="text/css" media="print" href="/wiki/skins/common/commonPrint.css" />
+    <!--[if lt IE 5.5000]><style type="text/css">@import "/wiki/skins/monobook/IE50Fixes.css";</style><![endif]-->
+    <!--[if IE 5.5000]><style type="text/css">@import "/wiki/skins/monobook/IE55Fixes.css";</style><![endif]-->
+    <!--[if IE 6]><style type="text/css">@import "/wiki/skins/monobook/IE60Fixes.css";</style><![endif]-->
+    <!--[if IE]><script type="text/javascript" src="/wiki/skins/common/IEFixes.js"></script>
     <meta http-equiv="imagetoolbar" content="no" /><![endif]-->
-    <script type="text/javascript" src="http://localhost:8000/static_media/skins/common/wikibits.js"></script>
-    <script type="text/javascript" src="http://localhost:8000/static_media/skins/offline/md5.js"></script>
-    <script type="text/javascript" src="http://localhost:8000/static_media/skins/offline/utf8.js"></script>
-    <script type="text/javascript" src="http://localhost:8000/static_media/skins/offline/lookup.js"></script>
-    <script type="text/javascript" src="http://localhost:8000/static_media/raw/gen.js"></script>        <style type="text/css">/*<![CDATA[*/
-@import "http://localhost:8000/static_media/raw/MediaWiki%7ECommon.css";
-@import "http://localhost:8000/static_media/raw/MediaWiki%7EMonobook.css";
-@import "http://localhost:8000/static_media/raw/gen.css";
+    <script type="text/javascript" src="/wiki/skins/common/wikibits.js"></script>
+    <script type="text/javascript" src="/wiki/skins/offline/md5.js"></script>
+    <script type="text/javascript" src="/wiki/skins/offline/utf8.js"></script>
+    <script type="text/javascript" src="/wiki/skins/offline/lookup.js"></script>
+    <script type="text/javascript" src="/wiki/raw/gen.js"></script>        <style type="text/css">/*<![CDATA[*/
+@import "/wiki/raw/MediaWiki%7ECommon.css";
+@import "/wiki/raw/MediaWiki%7EMonobook.css";
+@import "/wiki/raw/gen.css";
 /*]]>*/</style>          </head>
   <body
     class="ns-0">
