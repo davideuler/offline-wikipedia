@@ -1,7 +1,7 @@
 # Copyright (C) 2008 Shantanu Choudhary
 #This class is used to convert media-wiki text to corresponding html file
 #Known issues:
-#make table of content in case H goes beond 4
+#make table of content in case H goes beyond 4
 #identation, writing source codes
 #mathametical symbols
 #fix references, (right now ignoring them)
@@ -21,7 +21,8 @@ class Xml_Html:
 	def __init__(self,fname,start,end):				
 		#consider case of <nowiki>	
 		self.Toc = '<table id="toc" class="toc" summary="Contents">\n<tr>\n<td>\n<div id="toctitle">\n<h2>Contents</h2>\n</div>\n'
-		num = int(fname[21:26])		
+		offset = fname.find('rec')+3
+		num = int(fname[offset:offset+5])		
 		self.cwd = os.getcwd()
 		name_start = self.cwd+'/data/xml_blocks/rec'
 		name_end = 'enwiki-20080724-pages-articles.xml.bz2'
