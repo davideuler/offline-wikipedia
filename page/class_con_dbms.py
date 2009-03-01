@@ -12,27 +12,21 @@ import os
 from elementtree import ElementTree
 
 class Xml_Html:	
-	xml_html = '' #content of article in wiki
-	Toc = '' #content of table of content
-	flag_red = 0 #flag for redirection of page
-	link_red = '' #link of redirection
-	title = '' #title of the article
-	cwd = '' #path of current dir
-
-	#initialize, and extract the content of article
+	xml_html = ''
+	Toc = ''
+	flag_red = 0
+	link_red = ''
+	title = ''
+	cwd = ''
 	def __init__(self,fname,start,end):				
 		#consider case of <nowiki>	
 		self.Toc = '<table id="toc" class="toc" summary="Contents">\n<tr>\n<td>\n<div id="toctitle">\n<h2>Contents</h2>\n</div>\n'
-
-		#in case of csv no need of this, since we are storing the number of block
-		#offset = fname.find('rec')+3
-		num = int(fname)
+		offset = fname.find('rec')+3
+		num = int(fname[offset:offset+5])		
 		self.cwd = os.getcwd()
-		#name_start = self.cwd+'/data/xml_blocks/rec'
-		name_start = '/home/baali/off-wiki/data/xml_blocks/rec'
+		name_start = self.cwd+'/data/xml_blocks/rec'
 		name_end = 'enwiki-20080724-pages-articles.xml.bz2'
 		fname = '%(fstart)s%(fnum)05d%(fend)s' %{'fstart':name_start,'fnum':num,'fend':name_end}		
-
 		if end <= start:
 			#we have to collect article spread over two bloks			
 			num -= 1
@@ -41,16 +35,13 @@ class Xml_Html:
 			num += 1
 			fname = '%(fstart)s%(fnum)05d%(fend)s' %{'fstart':name_start,'fnum':num,'fend':name_end}
 			data = bz2.decompress(file.read())
-			data = data[int(start):len(data)]
+			data = data[start:len(data)]
 			file.close()
 			file = open(fname)		
-			data += bz2.decompress(file.read())[0:int(end)]+'</page>'
+			data += bz2.decompress(file.read())[0:end]+'</page>'
 		else:		
-			#normal case, article start and end in same block
 			file = open(fname)	
-			data = bz2.decompress(file.read())[int(start):int(end)]+'</page>'
-
-		#this is xml format of wikitext, we extract content of article
+			data = bz2.decompress(file.read())[start:end]+'</page>'			
 		tree = ElementTree.fromstring(data)		
 		for it in tree.getiterator():        		
 			if it.tag == 'title':
@@ -60,7 +51,6 @@ class Xml_Html:
 				#To check for redirection of pages
 				if self.xml_html.find('#REDIRECT') == 0 or self.xml_html.find('#redirect') == 0:					
 					self.flag_red = 1
-					#find the exact link of redirection...
 					if self.xml_html.find('|') != -1:
 						self.link_red = self.xml_html[self.xml_html.find('[[')+2:self.xml_html.find('|')]
 					else:
@@ -68,8 +58,6 @@ class Xml_Html:
 				else:
 					self.flag_red = 0
 		file.close()
-
-	#convert wiki-text to corresponding html format
 	def Process(self):			
 		#en_template is file having all css, Heading, footers, and other contents of a normal wikipedia page
 		template = open(self.cwd+'/data/en_template').read().decode('utf-8')
@@ -77,20 +65,13 @@ class Xml_Html:
 		self.Toc += '</ol>\n</td>\n</tr>\n</table>'
 		#variable containing final html string		
 		page_html = ''
-		#fixing all common css and other content of page
-		
-		#fixing the title of the page
 		page_html = template[0:template.find('<title>')]
 		page_html += '<title>'+self.title+'</titile>\n'
-		#heading of page
 		page_html += template[template.find('<title>')+7:template.find('<h1 class="firstHeading">')+len('<h1 class="firstHeading">')]
 		page_html += self.title+'</h1>'
 		page_html += template[template.find('<div id="bodyContent">'):template.find('<!-- start content -->')+len('<!-- start content -->')]+'\n'
-		#introduction of the article
 		page_html += self.xml_html[0:self.xml_html.find('<h2>')]
-		#Table of content
 		page_html += self.Toc
-		#rest of page
 		page_html += self.xml_html[self.xml_html.find('<h2>'):len(self.xml_html)]
 		page_html += template[template.find('<!-- start content -->')+len('<!-- start content -->'):len(template)]
 		return page_html
@@ -117,12 +98,12 @@ class Xml_Html:
 					elif link[0].find('(') != -1:
 						target += link[0][0:link[0].find('(')]
 					# to make all the offline links work which are interwiki, external links will remain normal, and no need to change them	
-					return '<a href="/wiki/'+link[0]+'/\">'+target+'</a>'
+					return '<a href=\"http://localhost:8000/wiki/'+link[0]+'\">'+target+'</a>'
 				else:
 					#normal [[]] link with refrence and name tag
-					return '<a href="/wiki/'+link[0]+'/\">'+link[-1]+'</a>'
+					return '<a href=\"http://localhost:8000/wiki/'+link[0]+'\">'+link[-1]+'</a>'
 			else :				
-				return '<a href="/wiki/'+tag+'/\">'+tag+'</a>'
+				return '<a href=\"http://localhost:8000/wiki/'+tag+'\">'+tag+'</a>'
 		else:	
 			#for creating external links 	
 			if tag.find(' ') != -1:
@@ -283,9 +264,9 @@ class Xml_Html:
 					break
 	        return position	
 	
-	#this is main function which calls other functions, fixes <p> tags, lists, links tables and all
+	#this is main funstion which calls other funstions, fixes <p> tags, lists, links tables and all
 	def blocks(self, data):
-	        #check the case when the list is in between table		
+	        #check the case when the list is in between table :P		
 		level_toc = 0
 	        html = ''
 		#to handle lists in wiki-text
@@ -352,11 +333,11 @@ class Xml_Html:
 				box_text += lines
 				box_open += lines.count('{{')				
 				continue
-			if box_open != 0 and lines.find('}}') != -1:
+			if box_open != 0 and lines.find('}}') != -1:								
 				box_open -= lines.count('}}')				
 				box_open += lines.count('{{')				
 				if box_open == 0:
-					box_text += lines[0:lines.find('}}')]+'}}'
+					box_text += lines[0:lines.find('}}')]+'}}'					
 					box_text = ''
 					lines = lines[lines.find('}}')+2:len(lines)]
 				else:
@@ -365,7 +346,7 @@ class Xml_Html:
 			if lines.find('{{') != -1 and lines.find('}}') == -1:
 				box_open = 1
 				box_text = lines[lines.find('{{'):len(lines)]
-				lines = lines[0:lines.find('{{')]
+				lines = lines[0:lines.find('{{')]								
 	
 			#for normal html refrence
 	                rg_href = re.compile(r'\[{1,2}([^\]]*)\]{1,2}')
@@ -413,7 +394,7 @@ class Xml_Html:
 	                        if start_p == 1:
 	                                html += '</p>\n'
 					start_p = 0                        
-	                        list_opened = 1
+	                        list_opened = 1                                                               
 	                        text = lines.lstrip('#*;')
 				if text == '':
 					continue
