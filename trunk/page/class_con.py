@@ -144,7 +144,7 @@ class Xml_Html:
 	#create table of all the headings, in case number of topics go beyond 4 and create TOC for it.
 	def heading(self,head_tag,level_toc):	
 		level = head_tag.count('=')/2
-		head_tag = head_tag.replace('=','')
+		head_tag = head_tag.replace('=','').strip()
 		if level_toc < level:
 			#new subtopic is opened
 			self.Toc += '<ol>\n<li><a href ="#'+head_tag+'">'+head_tag+'</a></li>\n'
