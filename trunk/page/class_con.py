@@ -89,7 +89,9 @@ class Xml_Html:
 		#introduction of the article
 		page_html += self.xml_html[0:self.xml_html.find('<h2>')]
 		#Table of content
-		page_html += self.Toc
+		#add Toc only when number of items go beyond 4
+		if self.Toc.count('<li>') >= 4:
+			page_html += self.Toc
 		#rest of page
 		page_html += self.xml_html[self.xml_html.find('<h2>'):len(self.xml_html)]
 		page_html += template[template.find('<!-- start content -->')+len('<!-- start content -->'):len(template)]
