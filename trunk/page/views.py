@@ -36,11 +36,21 @@ def req_handler(request, fname):
 	file_csv = 'article_'	
 	page = fname.split('/')
 	print page[-1]
-	#to make first letter capital, while in links it is smaller but in table/xml, it is always Capital
-	link = page[-1][0].upper()+page[-1][1:len(page[-1])]		
+	#check if first letter is alphabet or not..
+	if page[-1][0].isalpha():
+		#to make first letter capital, while in links it is smaller but in table/xml, it is always Capital
+		link = page[-1][0].upper()+page[-1][1:len(page[-1])]
+		file_reader = csv.reader(open(file_csv+link[0]))
+	elif page[-1][0].isdigit():
+		#first character is digit
+		link = page[-1]
+		file_reader = csv.reader(open(file_csv+'0'))
+	else:
+		#first character is special character
+		link = page[-1]
+		file_reader = csv.reader(open(file_csv+'special'))
 	print link
-
-	file_reader = csv.reader(open(file_csv+link[0]))	
+	
 	for r in file_reader:
 		if link.encode('utf-8') == r[0]:
 			break
@@ -50,13 +60,19 @@ def req_handler(request, fname):
 		#print len(r)
 		Obj = class_con.Xml_Html(r[1],r[2],r[3])
 		while Obj.flag_red == 1:
-			Obj.link_red = Obj.link_red[0].upper()+Obj.link_red[1:len(Obj.link_red)]			
+			if Obj.link_red[0].isalpha():
+				Obj.link_red = Obj.link_red[0].upper()+Obj.link_red[1:len(Obj.link_red)]
 			if r[0] == Obj.link_red.encode('utf-8'):
 				print Obj.link_red
 				#self redirecting loop..........
 				return HttpResponse('Page redirecting to Itself...')
 				break
-			file_reader = csv.reader(open(file_csv+Obj.link_red[0]))
+			if Obj.link_red[0].isalpha():
+				file_reader = csv.reader(open(file_csv+Obj.link_red[0]))
+			elif Obj.link_red[0].isdigit():
+				file_reader = csv.reader(open(file_csv+'0'))
+			else:
+				file_reader = csv.reader(open(file_csv+'special'))
 			for r in file_reader:
 				if Obj.link_red.encode('utf-8') == r[0]:
 					break
@@ -65,6 +81,6 @@ def req_handler(request, fname):
 				Obj = class_con.Xml_Html(r[1],r[2],r[3])
 			else:
 				break
-		return HttpResponse(Obj.Process())	 
+		return HttpResponse(Obj.Process())
 	else:
 		return HttpResponse('No page available!')
