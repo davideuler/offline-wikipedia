@@ -21,7 +21,7 @@ class Xml_Html:
 	footer_line = '' #this line marks starting of footer block
 
 	#initialize, and extract the content of article
-	def __init__(self,fname,start,end):				
+	def __init__(self,fname,start,end):
 		#consider case of <nowiki>	
 		self.Toc = '<table id="toc" class="toc" summary="Contents">\n<tr>\n<td>\n<div id="toctitle">\n<h2>Contents</h2>\n</div>\n'
 
@@ -32,7 +32,7 @@ class Xml_Html:
 		#name_start = self.cwd+'/data/xml_blocks/rec'
 		name_start = '/home/baali/off-wiki/data/xml_blocks/rec'
 		name_end = 'enwiki-20080724-pages-articles.xml.bz2'
-		fname = '%(fstart)s%(fnum)05d%(fend)s' %{'fstart':name_start,'fnum':num,'fend':name_end}		
+		fname = '%(fstart)s%(fnum)05d%(fend)s' %{'fstart':name_start,'fnum':num,'fend':name_end}
 
 		if end <= start:
 			#we have to collect article spread over two bloks			
@@ -70,29 +70,29 @@ class Xml_Html:
 					self.flag_red = 0
 		file.close()
 		self.find_footer()
-
+	
 	#to trace the presence of footer, category and translation in different languges
-	def find_footer():
+	def find_footer(self):
 		#regex for finding blocks
 		#we have to look for these blocks from end of the content.
 		reg = re.compile('^\[\[([^\]]+)\]\]$',re.M)
 		reg_prob = re.compile('^\{\{([^\}]+)\}\}$',re.M)
 		length = len(self.xml_html)
-		line = data[data.rfind('\n',0,length-2):length]
+		line = self.xml_html[self.xml_html.rfind('\n',0,length-2):length]
 		while True:
-			if not(reg.search(data[data.rfind('\n',0,length-2):length])):
-				if not(reg_prob.search(data[data.rfind('\n',0,length-2):length])):
+			if not(reg.search(self.xml_html[self.xml_html.rfind('\n',0,length-2):length])):
+				if not(reg_prob.search(self.xml_html[self.xml_html.rfind('\n',0,length-2):length])):
 					break
-			line = data[data.rfind('\n',0,length-2):length]
+			line = self.xml_html[self.xml_html.rfind('\n',0,length-2):length]
 			self.footer_line = line.replace('\n','').strip()
 			length = length-len(line)
-
+	
 	#convert wiki-text to corresponding html format
 	def Process(self):			
 		#en_template is file having all css, Heading, footers, and other contents of a normal wikipedia page
 		template = open(self.cwd+'/data/en_template').read().decode('utf-8')
 		self.xml_html = self.blocks(self.xml_html)
-		self.Toc += '</ol>\n</td>\n</tr>\n</table>'
+		self.Toc += '</ol>\n</td>\n</tr>\n</table>\n'
 		#variable containing final html string		
 		page_html = ''
 		#fixing all common css and other content of page
@@ -106,13 +106,17 @@ class Xml_Html:
 		page_html += template[template.find('<div id="bodyContent">'):template.find('<!-- start content -->')+len('<!-- start content -->')]+'\n'
 		#introduction of the article
 		page_html += self.xml_html[0:self.xml_html.find('<h2>')]
-		#Table of content
-		#add Toc only when number of items go beyond 4
+		#Table of content, will only add if tag <li> appears more then 4 times, that 
+		#number of items in TOC are more then 4
 		if self.Toc.count('<li>') >= 4:
 			page_html += self.Toc
 		#rest of page
-		page_html += self.xml_html[self.xml_html.find('<h2>'):len(self.xml_html)]
-		page_html += template[template.find('<!-- start content -->')+len('<!-- start content -->'):len(template)]
+		page_html += self.xml_html[self.xml_html.find('<h2>'):self.xml_html.find('<footer_block>')]
+		#OMG this is really messed up :(
+		page_html += template[template.find('<!-- start content -->')+len('<!-- start content -->'):template.find('</div>',template.find('<div class="printfooter">'))]+'</div>'
+		#adding the footer content...
+		page_html += self.xml_html[self.xml_html.find('<footer_block>'):len(self.xml_html)].replace('<footer_block>','')
+		page_html += template[template.find('</div>',template.find('<div class="printfooter">'))+6:len(template)]
 		return page_html
 
 	#for creating (ex/in)ternal links in a page
@@ -126,6 +130,7 @@ class Xml_Html:
 		tag = tag.replace('[','')	
 		tag = tag.replace(']','')
 		if cnt == 2:
+			#this is internal link
 			if tag.find('|') != -1 :
 				link = tag.split('|')			
 				if len(link[1]) == 0:
@@ -177,6 +182,7 @@ class Xml_Html:
 		else:
 			#new item in list	
 			self.Toc += '<li><a href ="#'+head_tag+'">'+head_tag+'</a></li>\n'
+		#this block converts heading to proper linked html tag
 		return '<p><a name="'+head_tag+'" id="'+head_tag+'"></a></p>\n<h'+str(level)+'>'+head_tag+'</h'+str(level)+'>'
 	
 	#this block takes care of tables
@@ -323,12 +329,26 @@ class Xml_Html:
 	        table = ''
 		#to check the starting of <p> block
 	        start_p = 0
+	        #to check for trailing block
+	        trail_list = 0
 		#to check for references
 		ref_open = 0
 		reference_data = ''
 		#for info/texo boxes .......
 		box_open = 0
 		box_text = ''
+		#compiling different regex
+		#to avoid/manage refrences and citation 
+		rg_ref = re.compile(r'<ref.*?/>')
+		rg_nonclosingref = re.compile(r'<ref.*?>.*?</ref>')
+		#for citation format is {{___}}
+		rg_cite = re.compile(r'\{\{[^\{]*?\}\}')
+		#for html refrences of form [[___]] these sqare bracket can be 1 or 2
+                rg_href = re.compile(r'\[{1,2}([^\]]*)\]{1,2}')
+                #regex for non-existing links of the form {{__}} same as reference
+                rg_dneref = re.compile(r'\{\{([^\}]*)\}\}')
+	        #for bold and italic data of the for ''___'' these "'" can be from two to five for bold/italic/both
+	        rg_bold_it = re.compile(r'\'{2,5}([^\']*)\'{2,5}')	        
 	        for lines in data:
 	                if len(lines) == 0:
 				#to see opening of new paragragh	                        
@@ -338,13 +358,13 @@ class Xml_Html:
 	                        elif start_p == 1:
 	                                html += '</p>\n'
 	                                start_p = 0
+	                        elif trail_list == 1:
+	                        	html += '<br /></div></div>\n'
+	                        	trail_list = 0	                        
 				continue
 				
 			#finish all the tags for a,b,h1 etc here itself
-	
-			#to avoid/manage refrences and citation 
-			rg_ref = re.compile(r'<ref.*?/>')
-			rg_nonclosingref = re.compile(r'<ref.*?>.*?</ref>')
+			
 			if ref_open == 1 and lines.find('</ref>') == -1:
 				reference_data += lines
 				continue
@@ -365,8 +385,7 @@ class Xml_Html:
 				lines = lines[0:lines.find('<ref')]	
 
 			#Info/texo boxes and all.....
-			#okay so this regex will remove all the nonexisting links also (as they appear in {{....}} blocks), so need to figure out how to jump this block might end up with <td></td> blocks
-			rg_cite = re.compile(r'\{\{[^\{]*?\}\}')
+			#okay so this regex will remove all the nonexisting links also (as they appear in {{....}} blocks), so need to figure out how to jump this block might end up with <td></td> blocks			
 			lines = rg_cite.sub(self.avoid_ref, lines)
 			if box_open != 0 and lines.find('}}') == -1:
 				box_text += lines
@@ -386,18 +405,22 @@ class Xml_Html:
 				box_open = 1
 				box_text = lines[lines.find('{{'):len(lines)]
 				lines = lines[0:lines.find('{{')]
-	
+			#this block is for ending list of diff languages and categories
+			#add this content to print footer block, and set div accordingly
+			#assuming article content ends here.
+			if lines.find(self.footer_line) == 0:
+				if lines.find('Category') != -1 and trail_list == 0:
+					html += '<footer_block><div id=\'catlinks\' class=\'catlinks\'><div id="mw-normal-catlinks">'
+				trail_list = 1
 			#for normal html refrence
-	                rg_href = re.compile(r'\[{1,2}([^\]]*)\]{1,2}')
 	                lines = rg_href.sub(self.ref_tag, lines)
 	                
 	                #for links to pages which do not exsist(right now just making the color red nothing else,
-	                #as of now this wikipedia does not support editing)
-	                rg_dneref = re.compile(r'\{\{([^\}]*)\}\}')
+	                #as of now this wikipedia does not support editing)	                
 	                lines = rg_dneref.sub(self.no_page, lines)
-	                rg_bold_it = re.compile(r'\'{2,5}([^\']*)\'{2,5}')
+	                #for bold and italic content
 	                lines = rg_bold_it.sub(self.bold_it, lines)
-	
+			#this is new heading
 	                if lines.find('==') == 0: 
 				old_line = lines
 				#close opened <p> if any
@@ -474,10 +497,16 @@ class Xml_Html:
 	                                       		html += list_tag[1]+text[0:col_pos-1]+list_tag[2]+'\n'
 	                                       		html += list_tag[3]+text[col_pos+1:len(text)]+list_tag[4]+'\n'
 	                        previous_tag = present_tag
-			else:
-	                	if list_opened == 1:
-	                        	html += list_tag[-1]+'\n'                                
-	                                list_opened = 0
-	                                previous_tag = ''						
-	                        html += lines+'<br />\n'		
+	                #this else seems to be working for list thing
+			else :
+				if list_opened == 1:
+	                        	html += list_tag[-1]+'\n'
+	                        	list_opened = 0
+	                                previous_tag = ''
+	                	html += lines
+			#in PHP parser there are lots of <p><br /></p> blocks, i am not using <br />
+	                if trail_list == 1:				
+	                       	html += '|'
+		if len(self.footer_line) != 0 and trail_list == 1:
+			html += '<br /></div></div>\n'
 		return html			
