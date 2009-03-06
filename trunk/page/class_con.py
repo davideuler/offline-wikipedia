@@ -18,6 +18,7 @@ class Xml_Html:
 	link_red = '' #link of redirection
 	title = '' #title of the article
 	cwd = '' #path of current dir
+	footer_line = '' #this line marks starting of footer block
 
 	#initialize, and extract the content of article
 	def __init__(self,fname,start,end):				
@@ -68,6 +69,23 @@ class Xml_Html:
 				else:
 					self.flag_red = 0
 		file.close()
+		self.find_footer()
+
+	#to trace the presence of footer, category and translation in different languges
+	def find_footer():
+		#regex for finding blocks
+		#we have to look for these blocks from end of the content.
+		reg = re.compile('^\[\[([^\]]+)\]\]$',re.M)
+		reg_prob = re.compile('^\{\{([^\}]+)\}\}$',re.M)
+		length = len(self.xml_html)
+		line = data[data.rfind('\n',0,length-2):length]
+		while True:
+			if not(reg.search(data[data.rfind('\n',0,length-2):length])):
+				if not(reg_prob.search(data[data.rfind('\n',0,length-2):length])):
+					break
+			line = data[data.rfind('\n',0,length-2):length]
+			self.footer_line = line.replace('\n','').strip()
+			length = length-len(line)
 
 	#convert wiki-text to corresponding html format
 	def Process(self):			
