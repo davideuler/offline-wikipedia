@@ -5,14 +5,14 @@ from django.http import HttpResponse
 
 def req_handler(request, fname):		
 	file_csv = 'article_'	
-	page = fname
+	page = fname.encode('utf-8')
 	print page
 	#check if first letter is alphabet or not..
 	if page[0].isalpha():
 		#to make first letter capital, while in links it is smaller but in table/xml, it is always Capital
 		link = page[0].upper()+page[1:len(page)]
 		file_reader = csv.reader(open(file_csv+link[0]))
-	elif page[-1][0].isdigit():
+	elif page[0].isdigit():
 		#first character is digit
 		link = page
 		file_reader = csv.reader(open(file_csv+'0'))
@@ -23,7 +23,7 @@ def req_handler(request, fname):
 	print link
 	
 	for r in file_reader:
-		if link.encode('utf-8') == r[0]:
+		if link == r[0]:
 			break
 
 	if r != None:
