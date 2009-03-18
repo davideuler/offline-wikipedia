@@ -5,6 +5,8 @@ from django.http import HttpResponse
 
 def req_handler(request, fname):		
 	file_csv = 'article_'	
+	#this case will work for english only, since for other languages all articles goes into category of special only and this wont hold valid anymore.
+	#for unicode type strings, characters of other languages also become alpahbets, accordingly, hence there was problem of special character articles were giving error. Pointed out by Stian.
 	page = fname.encode('utf-8')
 	print page
 	#check if first letter is alphabet or not..
