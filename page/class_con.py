@@ -29,9 +29,10 @@ class Xml_Html:
 		#offset = fname.find('rec')+3
 		num = int(fname)
 		self.cwd = os.getcwd()
-		#name_start = self.cwd+'/data/xml_blocks/rec'
-		name_start = '/home/baali/off-wiki/data/xml_blocks/rec'
-		name_end = 'enwiki-20080724-pages-articles.xml.bz2'
+		#replace this xxx with path to dir where blocks are present
+		name_start = 'xxx/rec'
+		#replace this xxx with date of dumps you have downloaded
+		name_end = 'enwiki-xxx-pages-articles.xml.bz2'
 		fname = '%(fstart)s%(fnum)05d%(fend)s' %{'fstart':name_start,'fnum':num,'fend':name_end}
 
 		if end <= start:
