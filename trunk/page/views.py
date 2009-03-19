@@ -23,9 +23,14 @@ def req_handler(request, fname):
 		link = page
 		file_reader = csv.reader(open(file_csv+'special'))
 	print link
-	
+
+	#looking through csv file is different then db.
+	#again this sorting of articles might not work in case of lang other then english
 	for r in file_reader:
 		if link == r[0]:
+			break
+		if link < r[0]:
+			r = None
 			break
 
 	if r != None:
@@ -48,13 +53,13 @@ def req_handler(request, fname):
 				file_reader = csv.reader(open(file_csv+'special'))
 			for r in file_reader:
 				if Obj.link_red.encode('utf-8') == r[0]:
-					break				
-			#this if else will result in page with redirected text, in case redirection link is not available in db/csv
-			#it wont work in case of csv, in case search of article fails, it will return the last article mentioned in scv file...
-			if r != None:
-				Obj = class_con.Xml_Html(r[1],r[2],r[3])
-			else:
-				break
+					#redirection link is initialized
+					Obj = class_con.Xml_Html(r[1],r[2],r[3])
+					break
+				#since all articles are alphabetical, this would work
+				elif Obj.link_red.encode('utf-8') < r[0]:
+					#we have passed the values where we could have found article
+					return HttpResponse('No page available!')
 		return HttpResponse(Obj.Process())
 	else:
 		return HttpResponse('No page available!')
