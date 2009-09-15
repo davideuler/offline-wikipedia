@@ -28,10 +28,8 @@ def req_handler(request, fname):
 	#again this sorting of articles might not work in case of lang other then english
 	for r in file_reader:
 		if link == r[0]:
-			break
-		if link < r[0]:
-			r = None
-			break
+			break		
+		r = None			
 
 	if r != None:
 		print r[0], r[1], r[2], r[3]
@@ -56,10 +54,9 @@ def req_handler(request, fname):
 					#redirection link is initialized
 					Obj = class_con.Xml_Html(r[1],r[2],r[3])
 					break
-				#since all articles are alphabetical, this would work
-				elif Obj.link_red.encode('utf-8') < r[0]:
-					#we have passed the values where we could have found article
-					return HttpResponse('No page available!')
+				r = None
+			if r == None:
+				return HttpResponse('No page available!')
 		return HttpResponse(Obj.Process())
 	else:
 		return HttpResponse('No page available!')
